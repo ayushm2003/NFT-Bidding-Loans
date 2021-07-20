@@ -1,4 +1,4 @@
-pragma soliity ^0.8.0;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -19,13 +19,16 @@ contract Loan {
 
     bool public acceptingBids = false;
 
-    modifier onlyOnwer() {
+    modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
 
+    // EVENTS
+    event NewHighestBid(address _bidder, uint256 _amount);
+
     constructor(address _owner, address _nftContract, uint _nftId, uint _duration) public {
-        owner = _owner;
+        owner = payable(_owner);
         nftContract = _nftContract;
         nftId = _nftId;
         duration = _duration;
@@ -38,25 +41,26 @@ contract Loan {
         require(msg.value > highestBid, "Loan amount less than the one already provided");
         if (highestBidder == address(0)) {
             highestBid = msg.value;
-            highestBidder = msg.sender;
+            highestBidder = payable(msg.sender);
             owner.transfer(msg.value);
         }
         else {
             highestBidder.transfer(highestBid);
             highestBid = msg.value;
-            highestBidder = msg.sender;
+            highestBidder = payable(msg.sender);
             owner.transfer(msg.value);
         }
+        emit NewHighestBid(msg.sender, msg.value);
     }
 
-    function repayLoan() public {
-        require(nftOnwed == true, "No loan was taken");
+    function repayLoan() public payable {
+        require(nftOwned == true, "No loan was taken");
         require(amtRepaid < highestBid, "Loan already repaid");
         amtRepaid += msg.value;
     }
 
     function liquidate() public {
-        require(nftOnwed == true, "No loan was taken");
+        require(nftOwned == true, "No loan was taken");
         require(duration < block.timestamp, "Loan still valid");
 
         if (amtRepaid < highestBid) {
@@ -83,6 +87,12 @@ contract Loan {
         acceptingBids = false;
     }
 
+    function startAcceptingBids() public onlyOwner {
+        require(acceptingBids == false, "Already accepting bids");
+        require(nftOwned == true, "Not in control of NFT");
+        acceptingBids = true;
+    }
+
     function repayAndEnd() public onlyOwner {
         require(amtRepaid == highestBid, "Loan not fully repaid");
         liquidate();
@@ -93,7 +103,7 @@ contract Loan {
         address from,
         uint256 tokenId,
         bytes calldata data
-    ) external override returns (bytes4) {
+    ) external returns (bytes4) {
         require(from == nftContract, "Incorrect NFT contract");
         require(tokenId == nftId, "Incorrect NFT ID");
 
