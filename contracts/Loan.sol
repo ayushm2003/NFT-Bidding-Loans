@@ -93,10 +93,6 @@ contract Loan {
         acceptingBids = true;
     }
 
-    function repayAndEnd() public onlyOwner {
-        require(amtRepaid == highestBid, "Loan not fully repaid");
-        liquidate();
-    }
 
     function onERC721Received(
         address operator,
