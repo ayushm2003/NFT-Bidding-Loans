@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
-contract Loan {
+contract Loan is IERC721Receiver {
 
     address payable public immutable owner;
     address public immutable nftContract;
@@ -99,7 +99,7 @@ contract Loan {
         address from,
         uint256 tokenId,
         bytes calldata data
-    ) external returns (bytes4) {
+    ) external override returns (bytes4) {
         require(from == nftContract, "Incorrect NFT contract");
         require(tokenId == nftId, "Incorrect NFT ID");
 
