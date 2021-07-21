@@ -1,6 +1,8 @@
 // Imports
 require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
+
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -13,4 +15,7 @@ module.exports = {
         accounts: [process.env.WALLET_PRIVATE_KEY_1],
       }
   },
+  etherscan: {
+      apiKey: process.env.ETHERSCAN_KEY
+  }
 };
