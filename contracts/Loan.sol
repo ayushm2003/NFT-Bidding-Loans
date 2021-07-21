@@ -100,8 +100,9 @@ contract Loan is IERC721Receiver {
         uint256 tokenId,
         bytes calldata data
     ) external override returns (bytes4) {
-        require(from == nftContract, "Incorrect NFT contract");
+        require(msg.sender == nftContract, "Incorrect NFT contract");
         require(tokenId == nftId, "Incorrect NFT ID");
+        require(IERC721(nftContract).ownerOf(tokenId) == address(this), "Did not tranfer the NFT");
 
         nftOwned = true;
 
