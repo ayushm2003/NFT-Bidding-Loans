@@ -11,6 +11,8 @@ contract Loan is IERC721Receiver {
     uint256 public immutable nftId;
     // The duration of loan specified by the loan recipient
     uint public immutable duration;
+    // The fees in percentage that the owner is willing to pay to bidder in case loan is repaid in full
+    uint public immutable fee;
 
     // Toggled when contract holds NFT
     bool public nftOwned;
@@ -32,11 +34,12 @@ contract Loan is IERC721Receiver {
     // Address of new highest bidder and the amount
     event NewHighestBid(address _bidder, uint256 _amount);
 
-    constructor(address _owner, address _nftContract, uint _nftId, uint _duration) public {
+    constructor(address _owner, address _nftContract, uint _nftId, uint _duration, uint _fee) public {
         owner = payable(_owner);
         nftContract = _nftContract;
         nftId = _nftId;
         duration = _duration;
+        fee = _fee;
     }
 
     /// @notice Lets people bid on the NFT. The highest bid's amount is transferred to the owner
