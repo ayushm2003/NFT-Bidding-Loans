@@ -57,10 +57,10 @@ contract Loan is IERC721Receiver {
         else {
             // Transfer the amount of the previous bid to the previously highest bidder
             highestBidder.transfer(highestBid);
+            // Tranfer the remaining amount to the owner
+            owner.transfer(msg.value - highestBid);
             highestBid = msg.value;
             highestBidder = payable(msg.sender);
-            // Tranfer the amount to the owner
-            owner.transfer(msg.value);
         }
 
         emit NewHighestBid(msg.sender, msg.value);
